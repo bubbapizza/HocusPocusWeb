@@ -43,7 +43,14 @@ def main(settings):
         print('email already taken')
         sys.exit(1)
 
-    password = getpass()
+    while True:
+        password = getpass()
+        comfirm_password = getpass(prompt='Confirm password: ')
+
+        if password != comfirm_password:
+            print('Passwords do not match! Try again.')
+        else:
+            break
 
     add_user(
         dbsession,

@@ -3,7 +3,7 @@
 import sys
 
 from setuptools.command.test import test as TestCommand
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 class PyTest(TestCommand):
@@ -30,6 +30,8 @@ install_requires = [
     'transaction',
     'zope.sqlalchemy',
     'waitress',
+    'wtforms',
+    'gunicorn',
 ]
 
 tests_require = [
@@ -48,7 +50,7 @@ setup(
     author='Randy Topliffe',
     author_email='randytopliffe@gamil.com',
     url='https://github.com/Taar/HocusPocusWeb',
-    packages=['hocuspocusweb'],
+    packages=find_packages(),
     setup_requires=setup_requires,
     install_requires=install_requires,
     tests_require=tests_require,

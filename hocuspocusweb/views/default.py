@@ -1,9 +1,13 @@
+import os
+import signal
+
+from pyramid.renderers import render_to_response
 from pyramid.response import Response
 from pyramid.view import view_config, view_defaults
 from sqlalchemy.orm.exc import NoResultFound
 
-
 from ..models.user import User
+from ..forms.open_door import OpenDoorForm
 
 
 @view_defaults(route_name='index')
@@ -18,14 +22,13 @@ class Index:
                         content_type='text/plain',
                         status_int=403)
 
-
     @view_config(renderer='../templates/index.jinja2',
                  attr='get',
                  request_method='GET')
     def get(self):
         return {}
 
-    @view_config(renderer='../templates/unlock.jinja2',
+    @view_config(renderer='../templates/index.jinja2',
                  attr='post',
                  request_method='POST')
     def post(self):
@@ -34,14 +37,36 @@ class Index:
         query = self.request.dbsession.query(User)
         print(ip_address)
         # will throw NoResultFound which will be handled in an Exception view
-        user = query.filter(User.ip_address == ip_address).one()
+        query.filter(User.ip_address == ip_address).one()
 
         print(self.request.POST)
         password = self.request.POST['password']
 
-        if user.check_password(password):
-            return {'name': user.name}
+        data = {
+            'ip_address': ip_address,
+            'password': password,
+        }
 
-        return Response('Password is not correct',
-                        content_type='text/plain',
-                        status_int=401)
+        form = OpenDoorForm(self.request.dbsession, data=data)
+
+        if form.validate():
+            print(self.request.door_pid)
+            try:
+                os.kill(int(self.request.door_pid), signal.SIGUSR1)
+            except ValueError:
+                return Response('Internal Error, PID is not a int.',
+                                content_type='text/plain',
+                                status_int=500)
+            except ProcessLookupError:
+                message = 'Process not found! Are you sure it is running?'
+                return Response(message,
+                                content_type='text/plain',
+                                status_int=500)
+            else:
+                return render_to_response(
+                    '../templates/unlock.jinja2',
+                    {'message': 'Success! Door is unlocking ... :D'},
+                    request=self.request
+                )
+
+        return {'form': form}

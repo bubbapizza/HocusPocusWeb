@@ -1,13 +1,5 @@
-import os
 from pyramid.response import Response
-
-
-def get_pid_file_contents(path):
-    if os.path.exists(path):
-        with open(path, 'r') as pid:
-            contents = pid.read()
-            return contents if contents else ''
-    return None
+from ..util.file_helpers import get_file_contents
 
 
 def pid_tween_factory(handler, registry):
@@ -19,23 +11,25 @@ def pid_tween_factory(handler, registry):
         )
 
         if not pid_path:
-            return Response('pid path not set in config',
+            return Response('PID path not set in config',
                             content_type='text/plain',
                             status_int=500)
 
-        pid_contents = get_pid_file_contents(pid_path)
+        pid_file_contents = get_file_contents(pid_path)
 
-        if pid_contents is not None:
-            if len(pid_contents) > 0:
-                message = pid_contents
-                status_int = 500
-            else:
-                message = 'Door is already unlocked'
-                status_int = 200
-
+        if pid_file_contents is None:
+            message = 'PID file not found in file system! {}'.format(pid_path)
             return Response(message,
                             content_type='text/plain',
-                            status_int=status_int)
+                            status_int=500)
+
+        elif len(pid_file_contents) <= 0:
+            message = 'Process ID not found in PID file! {}'.format(pid_path)
+            return Response(message,
+                            content_type='text/plain',
+                            status_int=500)
+        else:
+            request.door_pid = pid_file_contents
 
         return handler(request)
 
