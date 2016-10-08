@@ -44,6 +44,15 @@ def main(settings):
         sys.exit(1)
 
     while True:
+        mac_address = input('mac address(wifi): ')
+        confirm_mac_address = input('Comfirm mac address: ')
+
+        if mac_address != confirm_mac_address:
+            print('Mac addresses don\'t match. Try again')
+        else:
+            break
+
+    while True:
         password = getpass()
         comfirm_password = getpass(prompt='Confirm password: ')
 
@@ -55,6 +64,7 @@ def main(settings):
     add_user(
         dbsession,
         ip_address=ip_address,
+        mac_address=mac_address
         name=name,
         email=email,
         password=password

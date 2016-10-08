@@ -13,6 +13,7 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     ip_address = Column(String(100))
+    mac_address = Column(String(100))
     name = Column(Text)
     password = Column(String)
     email = Column(Text)
@@ -21,6 +22,7 @@ class User(Base):
         self.ip_address = kwargs.get('ip_address', None)
         self.name = kwargs.get('name', None)
         self.email = kwargs.get('email', None)
+        self.mac_address = kwargs.get('mac_address', None)
         password = kwargs.get('password', None)
         if password:
             self.set_password(password)
