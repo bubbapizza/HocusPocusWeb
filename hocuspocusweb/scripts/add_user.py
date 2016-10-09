@@ -64,7 +64,7 @@ def main(settings):
     add_user(
         dbsession,
         ip_address=ip_address,
-        mac_address=mac_address
+        mac_address=mac_address,
         name=name,
         email=email,
         password=password
