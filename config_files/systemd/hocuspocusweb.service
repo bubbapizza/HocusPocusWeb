@@ -1,0 +1,13 @@
+[Unit]
+Description=HocusPocus door controller web interface
+
+[Service]
+Type=simple
+User=hocuspocus
+WorkingDirectory=/var/lib/hocuspocus
+ExecStart=/opt/HocusPocusWeb/py3env/bin/gunicorn -w 1 --paster /opt/HocusPocusWeb/production.ini
+RemainAfterExit=no
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

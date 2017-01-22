@@ -1,0 +1,14 @@
+[Unit]
+Description=HocusPocus door controller service
+
+[Service]
+Type=simple
+User=hocuspocus
+WorkingDirectory=/var/lib/hocuspocus
+PIDFile=/var/run/hocuspocus/hocuspocus.pid
+ExecStart=/opt/HocusPocus/py3env/bin/python /opt/HocusPocus/hocuspocus/run.py /opt/HocusPocus/hocuspocus/door.ini
+RemainAfterExit=no
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
