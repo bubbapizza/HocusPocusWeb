@@ -1,24 +1,51 @@
+# This is where the hocuspocusweb interface can be reached.
 upstream hocuspocusweb {
     server 127.0.0.1:6543;
 }
 
+#
+# If someone tries to access hocuspocusweb via http, redirect them
+# to the secure website.  This is probably the most convenient way
+# to access hocuspocusweb since you don't even have to know the name
+# of the exact https url.
+#
 server {
-    listen 80;
+    listen 80 default_server;
+
+    # Redirect all unencrypted requests to https://door.hackforge.xyz.
+    return 301 https://door.hackforge.xyz;
+}
+
+
+#
+# If the user tries any other https site, show a page with a link to
+# the https://door.hackforge.xyz page.  This is how we get around the 
+# fact that SSL sites cannot be redirected to a different hostname.
+#
+server {
+    listen 443 default_server;
+
+    ssl_certificate /etc/nginx/ssl/wildcard.crt;
+    ssl_certificate_key /etc/nginx/ssl/wildcard.key;
+
+    location / {
+       root /var/www/html;
+       index index.html index.htm;
+
+       try_files $uri $uri/ /index.html;
+    }
+}
+
+#
+# This is the server that brings up the hocuspocusweb page.
+# It will only work by going to https://door.hackforge.xyz.
+#
+server {
+    server_name door.hackforge.xyz;
     listen 443 ssl;
 
     ssl_certificate /etc/nginx/ssl/wildcard.crt;
     ssl_certificate_key /etc/nginx/ssl/wildcard.key;
-
-    # Redirect all requests to port 8080 and dump any paths specified.
-    return 301 https://$host:8080;
-}
-
-server {
-    listen 8080 ssl;
-
-    ssl_certificate /etc/nginx/ssl/wildcard.crt;
-    ssl_certificate_key /etc/nginx/ssl/wildcard.key;
-
 
     # Proxying connections to application servers
     location / {
@@ -38,4 +65,5 @@ server {
         proxy_pass http://hocuspocusweb;
         proxy_redirect          off;
     }
+
 }

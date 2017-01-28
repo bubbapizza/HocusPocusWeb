@@ -1,0 +1,4 @@
+To configure the web server, rename the nginx.conf file and copy it 
+to /etc/nginx/sites-enabled.  Next, copy the index.html file to
+/var/www/html.  The index.html page is for capturing SSL sites that 
+users may try to reach.
