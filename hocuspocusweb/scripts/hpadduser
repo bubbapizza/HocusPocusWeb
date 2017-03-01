@@ -1,0 +1,12 @@
+#!/bin/sh
+
+prefix=/opt/HocusPocusWeb
+
+# stop all hocuspocusweb services
+systemctl stop nginx hocuspocusweb
+
+# Simple script to add a user to the hocuspocusweb database
+${prefix}/py3env/bin/python ${prefix}/hocuspocusweb/scripts/add_user.py ${prefix}/production.ini
+
+# start all hocuspocusweb services
+systemctl start nginx hocuspocusweb
